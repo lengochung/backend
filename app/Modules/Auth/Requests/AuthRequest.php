@@ -24,7 +24,7 @@ class AuthRequest extends Request
     public function rules()
     {
         return [
-            'email' => 'required',
+            'user_name' => 'required',
             'password' => 'required'
         ];
     }
@@ -37,7 +37,7 @@ class AuthRequest extends Request
     public function messages()
     {
         return [
-            "email.required" => __("validation.required", ["attribute" => __("label.email")]),
+            "user_name.required" => __("validation.required", ["attribute" => __("label.user_name")]),
             "password.required" => __("validation.required", ["attribute" => __("label.password")]),
         ];
     }

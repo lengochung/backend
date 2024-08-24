@@ -21,15 +21,10 @@ class UserModel extends BaseModel
      */
     protected $fillable = [
         'user_id',
-        'office_id',
-        'user_first_name',
-        'user_last_name',
-        'employee_no',
-        'affiliation',
-        'position',
-        'mail',
+        'head_id',
+        'full_name',
+        'user_name',
         'password',
-        'password_update_date',
         'update_date',
         'is_deleted',
     ];
@@ -134,9 +129,6 @@ class UserModel extends BaseModel
                 return;
             }
             $query = $this->where('user_id', $id);
-            if (!$includeDeleted) {
-                $query->where('is_deleted', DELETED_STATUS['NOT_DELETED']);
-            }
             $obj = $query->first();
             if (empty($obj)) {
                 $this->writeLog(__METHOD__ . ' [Line ' . __LINE__.']', false);
@@ -159,7 +151,7 @@ class UserModel extends BaseModel
      * @throws \Exception If an error occurs during the query.
      *
      * @date 2024/07/01 09:30
-     * @author duy.pham
+     * @author hung.le
      */
     public function getAllList($cond = null)
     {
@@ -232,7 +224,7 @@ class UserModel extends BaseModel
      * @throws \Exception If an error occurs during the query.
      *
      * @date 2024/07/01
-     * @author duy.pham
+     * @author hung.le
      */
     public function getTotalUsers($cond = null)
     {

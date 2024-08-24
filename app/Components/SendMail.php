@@ -7,9 +7,7 @@ use Exception;
 
 class SendMail
 {
-    public function __construct()
-    {
-    }
+    public function __construct() { }
 
     /**
      * send mail
@@ -37,7 +35,7 @@ class SendMail
      *
      * @returs boolean
      */
-    public function sendMail($mailData = null){
+    public function sendMail($mailData = null) {
         try {
             if (!$mailData) {
                 return false;

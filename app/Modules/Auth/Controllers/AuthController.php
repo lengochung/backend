@@ -3,24 +3,20 @@ namespace App\Modules\Auth\Controllers;
 
 use App\Utils\Lib;
 use Illuminate\Http\Request;
-use App\Modules\Models\OfficeModel;
 use Illuminate\Support\Facades\Auth;
 use App\Modules\Auth\Models\AuthModel;
 use Illuminate\Support\Facades\Validator;
 use App\Modules\Auth\Requests\AuthRequest;
 use App\Modules\Common\Controllers\BaseController;
+use App\Modules\Models\UserModel;
+use Illuminate\Support\Facades\Hash;
 
-class AuthController extends BaseController
-{
+class AuthController extends BaseController {
     /**
      * The AuthModel instance.
      */
     protected $authModel;
-    /**
-     * The OfficeModel instance.
-     */
-    protected $officeModel;
-
+    protected $userModel;
     /**
      * Create a new AuthController instance.
      *
@@ -28,11 +24,11 @@ class AuthController extends BaseController
      */
     public function __construct(
         AuthModel $authModel,
-        OfficeModel $officeModel,
+        UserModel $userModel,
     ){
         parent::__construct();
         $this->authModel = $authModel;
-        $this->officeModel = $officeModel;
+        $this->userModel = $userModel;
     }
 
     /**
@@ -46,9 +42,11 @@ class AuthController extends BaseController
         try {
             $this->writeLog(__METHOD__);
             $credentials = [
-                'mail' => $request->email,
+                'user_name' => $request->user_name,
                 'password' => $request->password
             ];
+            $b = Hash::make($credentials['password']);
+            // var_dump(json_encode($b));
             $checkValidate = $this -> checkValidate($request);
             if ($checkValidate != null) {
                 $this->writeLogLevel(__METHOD__ . ' [Line ' . __LINE__.']' . ' checkValidate', json_encode($request->all()) , 3);
@@ -61,27 +59,17 @@ class AuthController extends BaseController
             }
             $token = Auth::guard(AUTH_API_GUARD_KEY)->attempt($credentials);
             if (!$token) {
-                $this->writeLogLevel(__METHOD__ . ' [Line ' . __LINE__.']', sprintf(__('log.login_failed'), $request->email), 3);
+                $this->writeLogLevel(__METHOD__ . ' [Line ' . __LINE__.']', sprintf(__('log.login_failed'), $request->user_name), 3);
                 return Lib::returnJsonResult(false, __('message.login_failed'));
-            }
-            $role = $this->getRole();
-            if (!$role) {
-                $this->writeLogLevel(__METHOD__ . ' [Line ' . __LINE__.']', sprintf(__('log.login_no_permission'), $request->email), 3);
-                return Lib::returnJsonResult(false, __('message.login_no_permission'));
             }
 
             $user =  $this->guard()->user();
             $resUser['user_id'] = $user->user_id;
-            $resUser['office_id'] = $user->office_id;
-            $resUser['user_first_name'] = $user->user_first_name;
-            $resUser['user_last_name'] = $user->user_last_name;
-            $resUser['mail'] = $user->mail;
+            $resUser['head_id'] = $user->head_id;
+            $resUser['full_name'] = $user->full_name;
+            $resUser['email'] = $user->email;
             $resUser['access_token'] = $token;
-            $office = $this->officeModel->getById($resUser['office_id']);
-            if ($office) {
-                $resUser['group_office_id'] = $office->group_office_id;
-            }
-            $this->writeLogLevel(__METHOD__, sprintf(__('log.login_successful'), $request -> ip(), $request->email) , 1);
+            $this->writeLogLevel(__METHOD__, sprintf(__('log.login_successful'), $request -> ip(), $request->user_name) , 1);
             return Lib::returnJsonResult(true, '', $resUser);
         } catch (\Exception $e) {
             $this->writeLogLevel(__METHOD__ . ' [Line ' . __LINE__.']' , $e->getMessage(), 3);

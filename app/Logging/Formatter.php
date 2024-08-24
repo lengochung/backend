@@ -20,7 +20,7 @@ class Formatter
         $userId = '';
         $user = Auth::guard(AUTH_API_GUARD_KEY)->user();
         if (!empty($user)){
-            $userId = " [{$user -> id}] ";
+            $userId = " [{$user -> user_id}] ";
         }
         foreach ($logger->getHandlers() as $handler) {
             $now = Lib::getCurrentDate('Y-m-d H:i:s.v');
